@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Caveat:wght@400;600&display=swap');
+@import "tailwindcss";
+
+:root {
+  /* Page background: #000000 */
+  --color-dark: #000000;
+  --color-card-bg: #0D0D0D;
+  --color-card-border: #1E1E1E;
+  --color-icon-pill-bg: #1A1A1A;
+  --color-icon-pill-border: #2A2A2A;
+
+  --color-primary: #FFCC00;
+  /* Thermodynamic Yellow */
+  --color-accent-pink: #f97316;
+  /* Thermodynamic Orange */
+  --color-accent-amber: #FFCC00;
+  --color-accent-green: #10B981;
+
+  --color-text-white: #FFFFFF;
+  --color-text-muted: #888888;
+  --color-text-dim: #444444;
+
+  --font-display: 'Bebas Neue', cursive;
+  --font-body: 'Inter', sans-serif;
+  --font-accent: 'Caveat', cursive;
+
+  --bg-deep: #000000;
+  --accent-yellow: #FFCC00;
+  --accent-green: #10B981;
+  --accent-amber: #F59E0B;
+  --accent-red: #EF4444;
+}
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-accent: 'Caveat', cursive;
+
+  --color-background: var(--color-dark);
+  --color-foreground: var(--color-text-white);
+
+  --color-card: var(--color-card-bg);
+  --color-card-foreground: var(--color-text-white);
+
+  --color-border: var(--color-card-border);
+  --color-input: var(--color-card-border);
+  --color-ring: var(--color-primary);
+
+  --color-muted: var(--color-icon-pill-bg);
+  --color-muted-foreground: var(--color-text-muted);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    background-color: var(--color-dark);
+    color: var(--color-text-white);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .display-font {
+    font-family: var(--font-display);
+    @apply tracking-tighter uppercase;
+  }
+}
+
+/* Glowing Border Animation */
+@keyframes borderGlow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.card-glow-container {
+  position: relative;
+  padding: 1px;
+  border-radius: 13px;
+  background: var(--color-card-border);
+  transition: background 0.3s;
+}
+
+.card-glow-container:hover {
+  background: linear-gradient(90deg, #6366F1, #EC4899, #F59E0B, #10B981, #6366F1);
+  background-size: 200% auto;
+  animation: borderGlow 3s linear infinite;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+/* Navigation System Styles */
+.bg-shape {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.bg-shape.active {
+  opacity: 1;
+}
+
+.backdrop-layer {
+  position: absolute;
+  inset: 0;
+  transform: translateX(101%);
+}
+
+.nav-link {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-link-hover-bg {
+  pointer-events: none;
+}
+
+.nav-link-text {
+  /* Let GSAP handle color and transform transitions */
+}
+
+/* Custom easing class for utilities if needed */
+.ease-main {
+  transition-timing-function: cubic-bezier(0.65, 0.01, 0.05, 0.99);
+}
+
+.nav-overlay-wrapper[data-nav="open"] {
+  display: block !important;
+}
+
+.nav-overlay-wrapper[data-nav="closed"] {
+  display: none !important;
+}
