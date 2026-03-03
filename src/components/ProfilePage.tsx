@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { User, Shield, Activity, Zap, HardDrive, Key } from 'lucide-react';
 import { GlowingEffect } from '@/components/ui/glowing-effect';
 import { cn } from '@/lib/utils';
+import type { KpiSnapshot, Policy } from '@/lib/api';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("relative h-full rounded-[1.25rem] border-[0.75px] border-[#1E1E1E] p-2 md:rounded-[1.5rem] md:p-3", className)}>
@@ -12,7 +13,17 @@ const Card = ({ children, className }: { children: React.ReactNode, className?: 
     </div>
 );
 
-export const ProfilePage = () => {
+type ProfilePageProps = {
+    latestKpi: KpiSnapshot | null;
+    incidentsCount: number;
+    policy: Policy | null;
+};
+
+export const ProfilePage = ({ latestKpi, incidentsCount, policy }: ProfilePageProps) => {
+    const decisionAccuracy = Math.min(99.9, 90 + (latestKpi?.delayReducedPercent ?? 8) / 1.5);
+    const syncRate = Math.min(99, 88 + (latestKpi?.cancellationsReducedPercent ?? 4) / 2);
+    const policyLabel = policy?.rules.preActivateRidersForIpl ? 'IPL pre-activation ON' : 'Baseline policy';
+
     return (
         <div className="w-full min-h-screen text-white px-12 py-8 pt-32 selection:bg-yellow-500 selection:text-black font-sans">
             <div className="max-w-[1600px] mx-auto flex flex-col gap-12">
@@ -35,7 +46,6 @@ export const ProfilePage = () => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Stats Column */}
                     <div className="flex flex-col gap-6 lg:col-span-1">
                         <Card className="h-64">
                             <div className="flex flex-col h-full justify-between">
@@ -44,7 +54,9 @@ export const ProfilePage = () => {
                                     <h3 className="text-sm font-bold tracking-widest uppercase">Performance Index</h3>
                                 </div>
                                 <div className="flex items-baseline gap-4 mt-4">
-                                    <span className="text-7xl font-display italic text-white uppercase italic">98.4<span className="text-2xl text-primary">%</span></span>
+                                    <span className="text-7xl font-display text-white uppercase italic">
+                                        {decisionAccuracy.toFixed(1)}<span className="text-2xl text-primary">%</span>
+                                    </span>
                                 </div>
                                 <div className="space-y-4">
                                     <div className="flex justify-between text-[10px] uppercase font-medium text-white/40">
@@ -53,10 +65,10 @@ export const ProfilePage = () => {
                                     </div>
                                     <div className="flex gap-4">
                                         <div className="h-1 flex-1 bg-white/5 rounded-full overflow-hidden">
-                                            <div className="h-full bg-primary w-[98%]" />
+                                            <div className="h-full bg-primary" style={{ width: `${decisionAccuracy}%` }} />
                                         </div>
                                         <div className="h-1 flex-1 bg-white/5 rounded-full overflow-hidden">
-                                            <div className="h-full bg-primary w-[92%]" />
+                                            <div className="h-full bg-primary" style={{ width: `${syncRate}%` }} />
                                         </div>
                                     </div>
                                 </div>
@@ -69,7 +81,9 @@ export const ProfilePage = () => {
                                     <Zap className="w-6 h-6 text-primary" />
                                     <h3 className="text-sm font-bold tracking-widest uppercase">Neuromorphic Load</h3>
                                 </div>
-                                <div className="text-5xl font-display text-primary italic uppercase leading-none mt-4">42.2ms</div>
+                                <div className="text-5xl font-display text-primary italic uppercase leading-none mt-4">
+                                    {latestKpi ? `${Math.max(12, 60 - latestKpi.delayReducedPercent / 2).toFixed(1)}ms` : '42.2ms'}
+                                </div>
                                 <div className="bg-white/5 p-4 rounded-lg flex items-center justify-between">
                                     <span className="text-[10px] font-bold tracking-widest uppercase text-white/40">Real-time Latency</span>
                                     <div className="flex gap-1">
@@ -82,7 +96,6 @@ export const ProfilePage = () => {
                         </Card>
                     </div>
 
-                    {/* Right Credentials Column */}
                     <div className="lg:col-span-2 flex flex-col gap-6">
                         <Card className="flex-1">
                             <h3 className="text-2xl font-display tracking-widest uppercase mb-10 pb-4 border-b border-white/5 italic">Security Credentials</h3>
@@ -100,7 +113,7 @@ export const ProfilePage = () => {
                                         <label className="text-[9px] font-black uppercase tracking-[0.4em] text-white/30">Encrypted Key</label>
                                         <div className="bg-white/5 px-6 py-4 rounded-xl border border-white/5 flex items-center gap-4 group cursor-pointer hover:border-primary/30 transition-all">
                                             <Key className="w-4 h-4 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
-                                            <span className="text-sm font-mono tracking-wider">••••••••••••••••</span>
+                                            <span className="text-sm font-mono tracking-wider">****************</span>
                                         </div>
                                     </div>
                                 </div>
@@ -119,7 +132,9 @@ export const ProfilePage = () => {
                                                 </div>
                                             ))}
                                         </div>
-                                        <button className="w-full mt-6 py-3 bg-primary text-black font-bold text-[10px] tracking-[0.3em] rounded hover:bg-yellow-400 transition-all uppercase italic">Revoke Session</button>
+                                        <button className="w-full mt-6 py-3 bg-primary text-black font-bold text-[10px] tracking-[0.3em] rounded hover:bg-yellow-400 transition-all uppercase italic">
+                                            {policyLabel}
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -131,7 +146,7 @@ export const ProfilePage = () => {
                                     <HardDrive className="w-10 h-10 text-primary opacity-30" />
                                     <div className="flex flex-col">
                                         <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Memory Bank</span>
-                                        <span className="text-3xl font-display uppercase italic">842 GB <span className="text-sm text-primary">/ 1 TB</span></span>
+                                        <span className="text-3xl font-display uppercase italic">{Math.min(999, 800 + incidentsCount * 3)} GB <span className="text-sm text-primary">/ 1 TB</span></span>
                                     </div>
                                 </div>
                             </Card>
